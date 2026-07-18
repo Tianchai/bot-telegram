@@ -72,14 +72,15 @@ export const POST = async (request: Request) => {
     (employee) => employee.name,
   );
 
-  await axios.post(
-    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-    {
-      chat_id: "-1003717168310", // Target group ID
-      parse_mode: "MarkdownV2",
-      text: `คนมาสาย:\n• ${notSubmittedEmployeeNames?.join("\n• ") || "ไม่มีใครมาสาย"}`,
-    },
-  );
+  if (notSubmittedEmployeeNames?.length)
+    await axios.post(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        chat_id: "-1003717168310", // Target group ID
+        parse_mode: "MarkdownV2",
+        text: `คนมาสาย:\n• ${notSubmittedEmployeeNames?.join("\n• ") || "ไม่มีใครมาสาย"}`,
+      },
+    );
 
   return new Response("Send report");
 };
