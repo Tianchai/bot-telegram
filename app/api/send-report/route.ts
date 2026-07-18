@@ -46,14 +46,12 @@ export const POST = async (request: Request) => {
   // Get timesheet records from database table "timesheet" by using `emp_id` and `type` (in)
   const start = targetShift.subtract(1, "hour").format("YYYY-MM-DDTHH:mm:ss");
   const end = targetShift.add(15, "minute").format("YYYY-MM-DDTHH:mm:ss");
-  const response = await supabase
+  const { data: timesheetData } = await supabase
     .from("timesheet")
     .select("*")
     .in("emp_id", targetEmployees)
     .gte("created_at", start)
     .lte("created_at", end);
-
-  const timesheetData = response.data;
 
   // Filter employees who have not submitted their timesheet
   const submittedEmployeeIds = Array.from(
