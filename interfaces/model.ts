@@ -31,4 +31,5 @@ export interface Timesheet {
 export interface EmployeeShift {
   emp_id: number | Employee;
   shift_id: number | Shift;
+  workday?: string[];
 }
