@@ -30,18 +30,30 @@ export const POST = async (request: Request) => {
   );
 
   // Fetch data
-  const response = await supabase
+  const responseIn = await supabase
     .from("employee_shift")
     .select(
       "emp_id!inner (id, name, absence (*), timesheet (*)), shift_id!inner (*)",
     )
     .eq("shift_id.in", targetTime.format("HH:mm:ss"));
 
-  const data = response?.data as unknown as EmployeeShift[] | null;
+  const dataIn = responseIn?.data as unknown as EmployeeShift[] | null;
+
+  const employeeListId = dataIn?.map((row) => (row.emp_id as Employee).id);
+
+  const responseOut = await supabase
+    .from("employee_shift")
+    .select(
+      "emp_id!inner (id, name, absence (*), timesheet (*)), shift_id!inner (*)",
+    )
+    .eq("shift_id.out", targetTime.format("HH:mm:ss"))
+    .in("emp_id.id", employeeListId ?? []);
+
+  const dataOut = responseOut?.data as unknown as EmployeeShift[] | null;
 
   const lateEmployees: string[] = [];
 
-  data?.forEach((row) => {
+  dataIn?.forEach((row) => {
     const { emp_id, shift_id } = row;
 
     // Check if employee take absence on this shift
@@ -56,7 +68,28 @@ export const POST = async (request: Request) => {
       dayjs(ts.created_at).isBetween(start, end, "second", "[]"),
     );
 
-    if (!isAbsenceTaken && !isSubmittedInTime)
+    // Check if employee already submitted in prequel shift
+    const prequelData = dataOut?.find(
+      (item) => (item.emp_id as Employee).id === (emp_id as Employee).id,
+    );
+    const isPrequelAbsenceTaken = (
+      prequelData?.emp_id as Employee
+    )?.absence?.some((abs) => {
+      const prequelIn = (prequelData?.shift_id as Shift).in;
+      const timeS1 = dayjs(`1990-01-01 ${prequelIn}`, "YYYY-MM-DD HH:mm:ss");
+      const timeS2 = dayjs(
+        `1990-01-01 ${targetTime.format("HH:mm:ss")}`,
+        "YYYY-MM-DD HH:mm:ss",
+      );
+      const dayToSubtract = timeS1.isAfter(timeS2) ? 1 : 0;
+      const prequelTime = targetTime.subtract(dayToSubtract, "day");
+      return (
+        abs.shift_id === (prequelData?.shift_id as Shift).id &&
+        prequelTime.isSame(dayjs(abs.date), "day")
+      );
+    });
+
+    if (!isAbsenceTaken && !isSubmittedInTime && isPrequelAbsenceTaken)
       lateEmployees.push((emp_id as Employee)?.name);
   });
 
@@ -70,5 +103,5 @@ export const POST = async (request: Request) => {
       },
     );
 
-  return NextResponse.json(data);
+  return NextResponse.json({ in: dataIn, out: dataOut });
 };
