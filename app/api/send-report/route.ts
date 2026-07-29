@@ -76,22 +76,25 @@ export const POST = async (request: Request) => {
     const prequelData = dataOut?.find(
       (item) => (item.emp_id as Employee).id === (emp_id as Employee).id,
     );
-    const isPrequelAbsenceTaken = (
-      prequelData?.emp_id as Employee
-    )?.absence?.some((abs) => {
-      const prequelIn = (prequelData?.shift_id as Shift).in;
-      const timeS1 = dayjs(`1990-01-01 ${prequelIn}`, "YYYY-MM-DD HH:mm:ss");
-      const timeS2 = dayjs(
-        `1990-01-01 ${targetTime.format("HH:mm:ss")}`,
-        "YYYY-MM-DD HH:mm:ss",
-      );
-      const dayToSubtract = timeS1.isAfter(timeS2) ? 1 : 0;
-      const prequelTime = targetTime.subtract(dayToSubtract, "day");
-      return (
-        abs.shift_id === (prequelData?.shift_id as Shift).id &&
-        prequelTime.isSame(dayjs(abs.date), "day")
-      );
-    });
+    const isPrequelAbsenceTaken = !prequelData
+      ? true
+      : (prequelData?.emp_id as Employee)?.absence?.some((abs) => {
+          const prequelIn = (prequelData?.shift_id as Shift).in;
+          const timeS1 = dayjs(
+            `1990-01-01 ${prequelIn}`,
+            "YYYY-MM-DD HH:mm:ss",
+          );
+          const timeS2 = dayjs(
+            `1990-01-01 ${targetTime.format("HH:mm:ss")}`,
+            "YYYY-MM-DD HH:mm:ss",
+          );
+          const dayToSubtract = timeS1.isAfter(timeS2) ? 1 : 0;
+          const prequelTime = targetTime.subtract(dayToSubtract, "day");
+          return (
+            abs.shift_id === (prequelData?.shift_id as Shift).id &&
+            prequelTime.isSame(dayjs(abs.date), "day")
+          );
+        });
 
     if (!isAbsenceTaken && !isSubmittedInTime && isPrequelAbsenceTaken)
       lateEmployees.push((emp_id as Employee)?.name);
