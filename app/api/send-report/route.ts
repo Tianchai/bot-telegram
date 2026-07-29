@@ -2,6 +2,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import isBetween from "dayjs/plugin/isBetween";
+import timezone from "dayjs/plugin/timezone";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
@@ -9,6 +10,9 @@ import type { Employee, EmployeeShift, Shift } from "@/interfaces/model";
 
 dayjs.extend(utc);
 dayjs.extend(isBetween);
+dayjs.extend(timezone);
+
+dayjs.tz.setDefault("Asia/Bangkok");
 
 /**
  * Send report to the target of Telegram group
