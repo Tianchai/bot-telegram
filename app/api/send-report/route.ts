@@ -103,5 +103,5 @@ export const POST = async (request: Request) => {
       },
     );
 
-  return NextResponse.json({ in: dataIn, out: dataOut });
+  return NextResponse.json({ late: lateEmployees, in: dataIn, out: dataOut });
 };
