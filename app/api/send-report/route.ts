@@ -103,5 +103,11 @@ export const POST = async (request: Request) => {
       },
     );
 
-  return NextResponse.json({ late: lateEmployees, in: dataIn, out: dataOut });
+  return NextResponse.json({
+    timestamp: targetTime.format("YYYY-MM-DD HH:mm:ss.SSS"),
+    unix: targetTime.valueOf(),
+    late: lateEmployees,
+    in: dataIn,
+    out: dataOut,
+  });
 };
