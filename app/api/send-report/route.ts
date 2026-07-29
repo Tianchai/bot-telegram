@@ -102,7 +102,7 @@ export const POST = async (request: Request) => {
 
   if (lateEmployees?.length)
     await axios.post(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+      `https://api.telegram.org/bot${process.env.telegram_bot_token}/sendMessage`,
       {
         chat_id: "-1003717168310", // Target group ID
         parse_mode: "MarkdownV2",
