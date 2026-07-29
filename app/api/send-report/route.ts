@@ -106,6 +106,7 @@ export const POST = async (request: Request) => {
   return NextResponse.json({
     timestamp: targetTime.format("YYYY-MM-DD HH:mm:ss.SSS"),
     unix: targetTime.valueOf(),
+    shift,
     late: lateEmployees,
     in: dataIn,
     out: dataOut,
