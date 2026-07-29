@@ -24,7 +24,9 @@ export const POST = async (request: Request) => {
   const body = await request.json();
   const { shift } = body;
 
-  const targetTime = dayjs(shift * 1000).tz("Asia/Bangkok");
+  const targetTime = dayjs(shift * 1000)
+    .tz("Asia/Bangkok")
+    .subtract(15, "minute");
   const start = targetTime.subtract(1, "hour");
   const end = targetTime.add(15, "minute");
 
