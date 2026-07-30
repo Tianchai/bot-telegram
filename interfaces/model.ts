@@ -4,7 +4,7 @@ export interface Employee {
   name: string;
   send_alert: boolean;
   absence?: Absence[];
-  timesheet?: Timesheet[];
+  timesheet?: (Timesheet | TimesheetView)[];
 }
 
 export interface Shift {
@@ -26,6 +26,10 @@ export interface Timesheet {
   emp_id: number | Employee;
   type: "in" | "out";
   created_at: string; // ISO date format
+}
+
+export interface TimesheetView extends Timesheet {
+  created_at_unix: number; // Unix date format
 }
 
 export interface EmployeeShift {
