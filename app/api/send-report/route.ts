@@ -102,15 +102,15 @@ export const POST = async (request: Request) => {
       lateEmployees.push((emp_id as Employee)?.name);
   });
 
-  if (lateEmployees?.length)
-    await axios.post(
-      `https://api.telegram.org/bot${process.env.telegram_bot_token}/sendMessage`,
-      {
-        chat_id: "-1003717168310", // Target group ID
-        parse_mode: "MarkdownV2",
-        text: `คนมาสาย:\n• ${lateEmployees?.join("\n• ")}`,
-      },
-    );
+  // if (lateEmployees?.length)
+  //   await axios.post(
+  //     `https://api.telegram.org/bot${process.env.telegram_bot_token}/sendMessage`,
+  //     {
+  //       chat_id: "-1003717168310", // Target group ID
+  //       parse_mode: "MarkdownV2",
+  //       text: `คนมาสาย:\n• ${lateEmployees?.join("\n• ")}`,
+  //     },
+  //   );
 
   return NextResponse.json({
     timestamp: targetTime.format("YYYY-MM-DD HH:mm:ss.SSS"),
