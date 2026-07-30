@@ -12,14 +12,11 @@ dayjs.extend(utc);
 dayjs.extend(isBetween);
 dayjs.extend(timezone);
 
-dayjs.tz.setDefault("Asia/Bangkok");
-
 /**
  * Send report to the target of Telegram group
  * - FastCron is the service that will trigger this API every 15 minutes
  * - Checking time from shift of employee 1hr before and 15mins after
  */
-
 export const POST = async (request: Request) => {
   const body = await request.json();
   const { shift } = body;
