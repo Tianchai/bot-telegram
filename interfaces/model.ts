@@ -4,7 +4,8 @@ export interface Employee {
   name: string;
   send_alert: boolean;
   absence?: Absence[];
-  timesheet?: (Timesheet | TimesheetView)[];
+  timesheet?: Timesheet[];
+  timesheet_view?: TimesheetView[];
 }
 
 export interface Shift {
