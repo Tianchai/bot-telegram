@@ -113,6 +113,7 @@ export const POST = async (request: Request) => {
 
     debug.push({
       emp: (emp_id as Employee)?.name,
+      tsInfo,
       isAbsenceTaken,
       isSubmittedInTime,
       isPrequelAbsenceTaken,
