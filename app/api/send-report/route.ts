@@ -75,19 +75,21 @@ export const POST = async (request: Request) => {
 
     const tsInfo: Record<string, unknown>[] = [];
     // Check if employee submit timesheet in time
-    const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) => {
-      const tsv = ts as TimesheetView;
-      tsInfo.push({
-        created_at_unix: tsv.created_at_unix,
-        created_at: tsv.created_at,
-        formatted_created_at: dayjs
-          .tz(tsv.created_at_unix)
-          .format("YYYY-MM-DD HH:mm:ss.SSS"),
-        start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
-        end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
-      });
-      return dayjs(tsv.created_at).isBetween(start, end, "second", "[]");
-    });
+    const isSubmittedInTime = (emp_id as Employee)?.timesheet_view?.some(
+      (ts) => {
+        const tsv = ts as TimesheetView;
+        tsInfo.push({
+          created_at_unix: tsv.created_at_unix,
+          created_at: tsv.created_at,
+          formatted_created_at: dayjs
+            .tz(tsv.created_at_unix)
+            .format("YYYY-MM-DD HH:mm:ss.SSS"),
+          start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
+          end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
+        });
+        return dayjs(tsv.created_at).isBetween(start, end, "second", "[]");
+      },
+    );
 
     // Check if employee already submitted in prequel shift
     const prequelData = dataOut?.find(
