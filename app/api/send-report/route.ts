@@ -79,10 +79,11 @@ export const POST = async (request: Request) => {
       (ts) => {
         const tsv = ts as TimesheetView;
         tsInfo.push({
-          created_at_unix: tsv.created_at_unix,
+          created_at_unix: tsv.created_at_unix * 1000,
           created_at: tsv.created_at,
           formatted_created_at: dayjs
-            .tz(tsv.created_at_unix, dayjs.tz.guess())
+            .tz(tsv.created_at, dayjs.tz.guess())
+            .tz("Asia/Bangkok")
             .format("YYYY-MM-DD HH:mm:ss.SSS"),
           start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
           end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
