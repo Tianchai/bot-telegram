@@ -129,6 +129,7 @@ export const POST = async (request: Request) => {
   //   );
 
   return NextResponse.json({
+    timezone: dayjs.tz.guess(),
     timestamp: targetTime.format("YYYY-MM-DD HH:mm:ss.SSS"),
     unix: targetTime.valueOf(),
     shift,
