@@ -66,12 +66,14 @@ export const POST = async (request: Request) => {
     const isAbsenceTaken = (emp_id as Employee)?.absence?.some(
       (abs) =>
         abs.shift_id === (shift_id as Shift).id &&
-        targetTime.isSame(dayjs(abs.date), "day"),
+        targetTime.isSame(dayjs(abs.date).tz("Asia/Bangkok"), "day"),
     );
 
     // Check if employee submit timesheet in time
     const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) =>
-      dayjs(ts.created_at).isBetween(start, end, "second", "[]"),
+      dayjs(ts.created_at)
+        .tz("Asia/Bangkok")
+        .isBetween(start, end, "second", "[]"),
     );
 
     // Check if employee already submitted in prequel shift
@@ -94,7 +96,7 @@ export const POST = async (request: Request) => {
           const prequelTime = targetTime.subtract(dayToSubtract, "day");
           return (
             abs.shift_id === (prequelData?.shift_id as Shift).id &&
-            prequelTime.isSame(dayjs(abs.date), "day")
+            prequelTime.isSame(dayjs(abs.date).tz("Asia/Bangkok"), "day")
           );
         });
 
