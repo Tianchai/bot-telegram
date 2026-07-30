@@ -59,6 +59,8 @@ export const POST = async (request: Request) => {
 
   const lateEmployees: string[] = [];
 
+  const debug: Record<string, unknown>[] = [];
+
   dataIn?.forEach((row) => {
     const { emp_id, shift_id } = row;
 
@@ -100,6 +102,13 @@ export const POST = async (request: Request) => {
           );
         });
 
+    debug.push({
+      emp: (emp_id as Employee)?.name,
+      isAbsenceTaken,
+      isSubmittedInTime,
+      isPrequelAbsenceTaken,
+    });
+
     if (!isAbsenceTaken && !isSubmittedInTime && isPrequelAbsenceTaken)
       lateEmployees.push((emp_id as Employee)?.name);
   });
@@ -119,6 +128,7 @@ export const POST = async (request: Request) => {
     unix: targetTime.valueOf(),
     shift,
     late: lateEmployees,
+    debug,
     in: dataIn,
     out: dataOut,
   });
