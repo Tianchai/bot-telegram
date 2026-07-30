@@ -76,8 +76,8 @@ export const POST = async (request: Request) => {
     const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) => {
       tsInfo.push({
         created_at: ts.created_at,
-        formatted_created_at: dayjs
-          .tz(ts.created_at, "Asia/Bangkok")
+        formatted_created_at: dayjs(ts.created_at)
+          .tz("Asia/Bangkok")
           .format("YYYY-MM-DD HH:mm:ss.SSS"),
         start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
         end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
