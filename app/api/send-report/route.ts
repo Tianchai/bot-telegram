@@ -71,12 +71,21 @@ export const POST = async (request: Request) => {
         targetTime.isSame(dayjs(abs.date).tz("Asia/Bangkok"), "day"),
     );
 
+    const tsInfo: Record<string, unknown>[] = [];
     // Check if employee submit timesheet in time
-    const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) =>
-      dayjs(ts.created_at)
+    const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) => {
+      tsInfo.push({
+        created_at: ts.created_at,
+        formatted_created_at: dayjs(ts.created_at)
+          .tz("Asia/Bangkok")
+          .format("YYYY-MM-DD HH:mm:ss.SSS"),
+        start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
+        end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
+      });
+      return dayjs(ts.created_at)
         .tz("Asia/Bangkok")
-        .isBetween(start, end, "second", "[]"),
-    );
+        .isBetween(start, end, "second", "[]");
+    });
 
     // Check if employee already submitted in prequel shift
     const prequelData = dataOut?.find(
