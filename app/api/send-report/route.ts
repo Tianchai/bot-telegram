@@ -68,7 +68,7 @@ export const POST = async (request: Request) => {
     const isAbsenceTaken = (emp_id as Employee)?.absence?.some(
       (abs) =>
         abs.shift_id === (shift_id as Shift).id &&
-        targetTime.isSame(dayjs(abs.date).tz("Asia/Bangkok"), "day"),
+        targetTime.isSame(dayjs.tz(abs.date, "Asia/Bangkok"), "day"),
     );
 
     const tsInfo: Record<string, unknown>[] = [];
@@ -76,9 +76,9 @@ export const POST = async (request: Request) => {
     const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) => {
       tsInfo.push({
         created_at: ts.created_at,
-        formatted_created_at: dayjs(ts.created_at).format(
-          "YYYY-MM-DD HH:mm:ss.SSS",
-        ),
+        formatted_created_at: dayjs
+          .tz(ts.created_at, "Asia/Bangkok")
+          .format("YYYY-MM-DD HH:mm:ss.SSS"),
         start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
         end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
       });
@@ -105,7 +105,7 @@ export const POST = async (request: Request) => {
           const prequelTime = targetTime.subtract(dayToSubtract, "day");
           return (
             abs.shift_id === (prequelData?.shift_id as Shift).id &&
-            prequelTime.isSame(dayjs(abs.date).tz("Asia/Bangkok"), "day")
+            prequelTime.isSame(dayjs.tz(abs.date, "Asia/Bangkok"), "day")
           );
         });
 
