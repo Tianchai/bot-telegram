@@ -6,11 +6,18 @@ import timezone from "dayjs/plugin/timezone";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-import type { Employee, EmployeeShift, Shift } from "@/interfaces/model";
+import type {
+  Employee,
+  EmployeeShift,
+  Shift,
+  TimesheetView,
+} from "@/interfaces/model";
 
 dayjs.extend(utc);
 dayjs.extend(isBetween);
 dayjs.extend(timezone);
+
+dayjs.tz.setDefault("Asia/Bangkok");
 
 /**
  * Send report to the target of Telegram group
@@ -21,9 +28,7 @@ export const POST = async (request: Request) => {
   const body = await request.json();
   const { shift } = body;
 
-  const targetTime = dayjs(shift * 1000)
-    .tz("Asia/Bangkok")
-    .subtract(15, "minute");
+  const targetTime = dayjs.tz(shift * 1000).subtract(15, "minute");
   const start = targetTime.subtract(1, "hour");
   const end = targetTime.add(15, "minute");
 
@@ -36,7 +41,7 @@ export const POST = async (request: Request) => {
   const responseIn = await supabase
     .from("employee_shift")
     .select(
-      "emp_id!inner (id, name, absence (*), timesheet (*)), shift_id!inner (*)",
+      "emp_id!inner (id, name, absence (*), timesheet_view (*)), shift_id!inner (*)",
     )
     .eq("shift_id.in", targetTime.format("HH:mm:ss"));
 
@@ -47,7 +52,7 @@ export const POST = async (request: Request) => {
   const responseOut = await supabase
     .from("employee_shift")
     .select(
-      "emp_id!inner (id, name, absence (*), timesheet (*)), shift_id!inner (*)",
+      "emp_id!inner (id, name, absence (*), timesheet_view (*)), shift_id!inner (*)",
     )
     .eq("shift_id.out", targetTime.format("HH:mm:ss"))
     .in("emp_id.id", employeeListId ?? []);
@@ -65,21 +70,23 @@ export const POST = async (request: Request) => {
     const isAbsenceTaken = (emp_id as Employee)?.absence?.some(
       (abs) =>
         abs.shift_id === (shift_id as Shift).id &&
-        targetTime.isSame(dayjs.tz(abs.date, "Asia/Bangkok"), "day"),
+        targetTime.isSame(dayjs.tz(abs.date), "day"),
     );
 
     const tsInfo: Record<string, unknown>[] = [];
     // Check if employee submit timesheet in time
     const isSubmittedInTime = (emp_id as Employee)?.timesheet?.some((ts) => {
+      const tsv = ts as TimesheetView;
       tsInfo.push({
-        created_at: ts.created_at,
-        formatted_created_at: dayjs(ts.created_at)
-          .tz("Asia/Bangkok")
+        created_at_unix: tsv.created_at_unix,
+        created_at: tsv.created_at,
+        formatted_created_at: dayjs
+          .tz(tsv.created_at_unix)
           .format("YYYY-MM-DD HH:mm:ss.SSS"),
         start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
         end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
       });
-      return dayjs(ts.created_at).isBetween(start, end, "second", "[]");
+      return dayjs(tsv.created_at).isBetween(start, end, "second", "[]");
     });
 
     // Check if employee already submitted in prequel shift
@@ -102,7 +109,7 @@ export const POST = async (request: Request) => {
           const prequelTime = targetTime.subtract(dayToSubtract, "day");
           return (
             abs.shift_id === (prequelData?.shift_id as Shift).id &&
-            prequelTime.isSame(dayjs.tz(abs.date, "Asia/Bangkok"), "day")
+            prequelTime.isSame(dayjs.tz(abs.date), "day")
           );
         });
 
