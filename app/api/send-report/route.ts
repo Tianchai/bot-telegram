@@ -82,7 +82,7 @@ export const POST = async (request: Request) => {
           created_at_unix: tsv.created_at_unix,
           created_at: tsv.created_at,
           formatted_created_at: dayjs
-            .tz(tsv.created_at_unix)
+            .tz(tsv.created_at_unix, dayjs.tz.guess())
             .format("YYYY-MM-DD HH:mm:ss.SSS"),
           start: start.format("YYYY-MM-DD HH:mm:ss.SSS"),
           end: end.format("YYYY-MM-DD HH:mm:ss.SSS"),
